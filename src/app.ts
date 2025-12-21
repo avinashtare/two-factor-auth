@@ -9,7 +9,12 @@ app.use(express.json());
 
 // 404 Handler
 app.use((_req, _res, next) => {
-  next(new ApplicationException("Page Not Found", 404));
+  return next(
+    new ApplicationException(
+      "Sorry, the page you’re looking for doesn’t exist.",
+      404
+    )
+  );
 });
 
 // Global Error Handler

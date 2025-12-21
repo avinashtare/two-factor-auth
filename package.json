@@ -14,11 +14,13 @@
   "type": "commonjs",
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/mongoose": "^5.11.96",
     "@types/node": "^25.0.3",
     "prettierrc": "^0.0.0-5",
     "tsx": "^4.21.0"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mongoose": "^9.0.2"
   }
 }
