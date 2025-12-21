@@ -1,5 +1,16 @@
-import process = require("node:process")
+import app from "./app";
+import envConfig from "./config/env.config";
 
-console.log("hello world!")
-let a = 34
-console.log(process.env.NODE_ENV)
+const startApp = () => {
+  try {
+    const server = app.listen(envConfig.PORT);
+    // max time for an request
+    server.timeout = envConfig.Server_Request_Timeout;
+
+    console.log("Server Started on http://localhost:" + envConfig.PORT);
+  } catch (error) {
+    console.error("Application Error", error);
+  }
+};
+
+startApp();
