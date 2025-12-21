@@ -1,6 +1,6 @@
 import { QueryFilter, UpdateQuery, UpdateWriteOpResult } from "mongoose";
 import { IUserRepository } from "../interfaces/user.interface";
-import { IUserSchema } from "../types/user.types";
+import { IUserSchema } from "../types/user.type";
 import userModel from "../models/user.model";
 
 export default class UserRepository implements IUserRepository {
@@ -8,7 +8,7 @@ export default class UserRepository implements IUserRepository {
     return userModel.findOne(filter).select(select);
   };
 
-  create = (payload: IUserSchema) => {
+  create = (payload: Omit<IUserSchema, "id">) => {
     return userModel.create(payload);
   };
 

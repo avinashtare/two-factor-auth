@@ -12,7 +12,7 @@ export type TTwoFactorAuth = {
 };
 
 export interface IUserSchema {
-  id: Types.ObjectId;
+  _id?: Types.ObjectId;
   name: string;
   email: string;
   password: string;

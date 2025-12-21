@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { IUserSchema } from "../types/user.types";
+import { IUserSchema } from "../types/user.type";
 
 const twoFactorAuthRecoveryCodeSchema = new Schema<
   IUserSchema["twoFactorAuth"]["recoveryCodes"][0]
@@ -20,7 +20,7 @@ const twoFactorAuthSchema = new Schema<IUserSchema["twoFactorAuth"]>(
     },
     secret: {
       type: String,
-      required: true,
+      default: null,
       select: false
     },
     recoveryCodes: {
