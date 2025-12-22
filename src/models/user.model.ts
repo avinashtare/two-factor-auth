@@ -33,24 +33,27 @@ const twoFactorAuthSchema = new Schema<IUserSchema["twoFactorAuth"]>(
   { _id: false }
 );
 
-const userSchema = new Schema<IUserSchema>({
-  name: {
-    type: String,
-    required: true
+const userSchema = new Schema<IUserSchema>(
+  {
+    name: {
+      type: String,
+      required: true
+    },
+    email: {
+      type: String,
+      required: true
+    },
+    password: {
+      type: String,
+      required: true,
+      select: false
+    },
+    twoFactorAuth: {
+      type: twoFactorAuthSchema,
+      required: true
+    }
   },
-  email: {
-    type: String,
-    required: true
-  },
-  password: {
-    type: String,
-    required: true,
-    select: false
-  },
-  twoFactorAuth: {
-    type: twoFactorAuthSchema,
-    required: true
-  }
-});
+  { timestamps: true }
+);
 
 export default model("user", userSchema);
