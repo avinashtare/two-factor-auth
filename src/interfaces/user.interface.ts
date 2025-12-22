@@ -3,10 +3,7 @@ import { QueryFilter, UpdateQuery, UpdateWriteOpResult } from "mongoose";
 import { RequestHandler } from "express";
 import { TServiceSuccess } from "../types/service.type";
 import z from "zod";
-import {
-  loginUserValidator,
-  registerUserValidator
-} from "../validator/user.validator";
+import { loginUserValidator, registerUserValidator } from "../validator/user.validator";
 
 export interface IUserRequestData {
   register: {
@@ -15,33 +12,28 @@ export interface IUserRequestData {
   login: {
     body: z.infer<typeof loginUserValidator>;
   };
+  activate2FA: {
+    user: IUserSchema;
+  };
 }
 
 // controller
 export interface IUserController {
   register: RequestHandler;
   login: RequestHandler;
+  activate2FA: RequestHandler;
 }
 
 export interface IUserService {
-  register: (
-    payload: IUserRequestData["register"]["body"]
-  ) => Promise<TServiceSuccess<{ userId: string }>>;
-  login: (
-    payload: IUserRequestData["login"]["body"]
-  ) => Promise<TServiceSuccess<{ userId: string; accessToken: string }>>;
+  register: (payload: IUserRequestData["register"]["body"]) => Promise<TServiceSuccess<{ userId: string }>>;
+  login: (payload: IUserRequestData["login"]["body"]) => Promise<TServiceSuccess<{ userId: string; accessToken: string }>>;
+  activate2FA: (payload: IUserRequestData["activate2FA"]["user"]) => Promise<TServiceSuccess<{ qrDataUrl: string; recoveryCodes: string[] }>>;
 }
 
 export interface IUserRepository {
-  findOne: (
-    filter: QueryFilter<IUserSchema>,
-    select?: string
-  ) => Promise<IUserSchema | null>;
+  findOne: (filter: QueryFilter<IUserSchema>, select?: string) => Promise<IUserSchema | null>;
 
   create: (payload: IUserSchema) => Promise<IUserSchema>;
 
-  updateOne: (
-    filter: QueryFilter<IUserSchema>,
-    update: UpdateQuery<IUserSchema>
-  ) => Promise<UpdateWriteOpResult>;
+  updateOne: (filter: QueryFilter<IUserSchema>, update: UpdateQuery<IUserSchema>) => Promise<UpdateWriteOpResult>;
 }
