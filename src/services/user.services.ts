@@ -9,6 +9,7 @@ import { serviceSuccess } from "../helper/service.heloper";
 import { IUserRepository, IUserRequestData, IUserService } from "../interfaces/user.interface";
 import { JwtPaylaod } from "../types/jwt.types";
 import { daysMiliSeconds, minutesMiliSeconds } from "../helper/date-time.helper";
+import { TServiceSuccess } from "../types/service.type";
 
 export default class UserService implements IUserService {
   constructor(private userRepository: IUserRepository) {}
@@ -141,5 +142,8 @@ export default class UserService implements IUserService {
       twoFactorAuth: { activated: false },
       createdAt: user.createdAt!,
     });
+  };
+  logout = (payload: IUserRequestData["logout"]) => {
+    return serviceSuccess("Logout success", { userId: String(payload.user._id) });
   };
 }

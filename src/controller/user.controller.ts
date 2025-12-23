@@ -4,6 +4,8 @@ import { loginUserValidator, registerUserValidator, verify2FAValidator } from ".
 import { getCookieOptions } from "../helper/cookie.helper";
 import { IAuthenticatedRequest } from "../types/auth.type";
 import { daysMiliSeconds, minutesSeconds } from "../helper/date-time.helper";
+import { ParamsDictionary } from "express-serve-static-core";
+import { ParsedQs } from "qs";
 
 export default class UserController implements IUserController {
   constructor(private userService: IUserService) {}
@@ -75,6 +77,19 @@ export default class UserController implements IUserController {
     const { user } = req as IAuthenticatedRequest;
 
     const response = await this.userService.me({ user });
+
+    res.status(200).json(response);
+  };
+  logout: RequestHandler = (req, res, next) => {
+    const { user, cookies } = req as IAuthenticatedRequest;
+
+    const response = this.userService.logout({ user });
+
+    // clear cookie
+    const cookieOptions = getCookieOptions({ purpose: "logout" });
+    for (const cookie of Object.keys(cookies)) {
+      res.clearCookie(cookie, cookieOptions);
+    }
 
     res.status(200).json(response);
   };

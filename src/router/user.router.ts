@@ -24,4 +24,6 @@ userRouter.route("/verify-2fa").post(authMiddleware({ stage: ["password"], repos
 
 userRouter.route("/me").post(authMiddleware({ stage: ["2fa", "password"], repositories: { userRepository } }), userController.me);
 
+userRouter.route("/logout").post(authMiddleware({ stage: ["2fa", "password"], repositories: { userRepository } }), userController.logout);
+
 export default userRouter;

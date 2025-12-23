@@ -22,6 +22,9 @@ export interface IUserRequestData {
   me: {
     user: IUserSchema;
   };
+  logout: {
+    user: IUserSchema;
+  };
 }
 
 // controller
@@ -31,6 +34,7 @@ export interface IUserController {
   activate2FA: RequestHandler;
   verify2FA: RequestHandler;
   me: RequestHandler;
+  logout: RequestHandler;
 }
 
 export interface IUserService {
@@ -47,6 +51,7 @@ export interface IUserService {
     twoFactorAuth: { activated: boolean };
     createdAt: Date;
   }>;
+  logout: (payload: IUserRequestData["logout"]) => TServiceSuccess<{ userId: string }>;
 }
 
 export interface IUserRepository {
