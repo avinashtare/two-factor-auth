@@ -1,5 +1,5 @@
 import envConfig from "../config/env.config";
-import { generateRecoveryCodes, generateTOTP } from "../helper/2fa.heloper";
+import { generateRecoveryCodes, generateTOTP, TRecoveryCodes } from "../helper/2fa.heloper";
 import { ApplicationException } from "../helper/error.helper";
 import { signJwt } from "../helper/jwt.helper";
 import { compareHash, hashValue } from "../helper/password-encryption.helper";
@@ -137,13 +137,9 @@ export default class UserService implements IUserService {
 
     // properties
     const secret = totp.secret.base32;
-    const recoveryCodes = await generateRecoveryCodes(10);
 
     // update user
-    const updateUser = await this.userRepository.updateOne(
-      { _id: String(user._id) },
-      { $set: { "twoFactorAuth.secret": secret, "twoFactorAuth.recoveryCodes": recoveryCodes.hashed.map((code) => ({ code, used: false })) } },
-    );
+    const updateUser = await this.userRepository.updateOne({ _id: String(user._id) }, { $set: { "twoFactorAuth.secret": secret } });
 
     // if not able to update secret and recoveryCodes
     if (updateUser.modifiedCount === 0) {
@@ -151,7 +147,7 @@ export default class UserService implements IUserService {
     }
 
     // 2FA QR generation
-    return serviceSuccess("Activation completed", { qrDataUrl, recoveryCodes: recoveryCodes.plainText });
+    return serviceSuccess("Activation completed", { qrDataUrl });
   };
   verify2FA = async (payload: IUserRequestData["verify2FA"]) => {
     const { user } = payload;
@@ -169,10 +165,24 @@ export default class UserService implements IUserService {
 
     const is2FAActivated = user.twoFactorAuth.activated;
 
+    let recoveryCodes: TRecoveryCodes = { hashed: [], plainText: [] };
     // if already activated
     if (!is2FAActivated) {
+      recoveryCodes = await generateRecoveryCodes(10);
+
       // update user activaton
-      const updateUserActivaton = await this.userRepository.updateOne({ _id: String(user._id) }, { $set: { "twoFactorAuth.activated": true } });
+      const updateUserActivaton = await this.userRepository.updateOne(
+        { _id: String(user._id) },
+        {
+          $set: {
+            "twoFactorAuth.activated": true,
+            "twoFactorAuth.recoveryCodes": recoveryCodes.hashed.map((code) => ({
+              code,
+              used: false,
+            })),
+          },
+        },
+      );
 
       // if not able to update activated status
       if (updateUserActivaton.modifiedCount === 0) {
@@ -186,7 +196,7 @@ export default class UserService implements IUserService {
     // generate long access token
     const accessToken = signJwt({ stage: "2fa", userId: String(user._id) }, envConfig.ACCESS_TOKEN_SECRET, daysMiliSeconds(30));
 
-    return serviceSuccess("TwoFactorAuth Suucess", { userId: String(user._id), accessToken });
+    return serviceSuccess("TwoFactorAuth Suucess", { userId: String(user._id), accessToken, recoveryCodes: recoveryCodes.plainText });
   };
   me = (payload: IUserRequestData["me"]) => {
     let { user } = payload;

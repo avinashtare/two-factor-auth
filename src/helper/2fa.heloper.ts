@@ -15,7 +15,7 @@ export const generateTOTP = (name: string, base32?: string) => {
   return totp;
 };
 
-type TRecoveryCodes = Record<"plainText" | "hashed", string[]>;
+export type TRecoveryCodes = Record<"plainText" | "hashed", string[]>;
 
 export const generateRecoveryCodes = async (count: number): Promise<TRecoveryCodes> => {
   const alphaNumaricStr = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
