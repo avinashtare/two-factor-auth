@@ -2,13 +2,14 @@ import { customAlphabet } from "nanoid";
 import OTPauth from "otpauth";
 import { hashValue } from "./password-encryption.helper";
 
-export const generateTOTP = (name: string) => {
+export const generateTOTP = (name: string, base32?: string) => {
   const totp = new OTPauth.TOTP({
     issuer: "avinash.com", // app/website name
     label: name, // user info
     algorithm: "SHA256",
     digits: 6, // otp count min:6 count
     period: 30, // new otp time min: 30s
+    ...(base32 ? { secret: OTPauth.Secret.fromBase32(base32) } : {}),
   });
 
   return totp;

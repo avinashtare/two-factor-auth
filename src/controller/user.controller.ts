@@ -1,11 +1,12 @@
 import { RequestHandler } from "express";
 import { IUserController, IUserRequestData, IUserService } from "../interfaces/user.interface";
-import { loginUserValidator, registerUserValidator } from "../validator/user.validator";
+import { loginUserValidator, registerUserValidator, verify2FAValidator } from "../validator/user.validator";
 import { getCookieOptions } from "../helper/cookie.helper";
 import envConfig from "../config/env.config";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
 import { IAuthenticatedRequest } from "../types/auth.type";
+import { daysMiliSeconds, minutesSeconds } from "../helper/date-time.helper";
 
 export default class UserController implements IUserController {
   constructor(private userService: IUserService) {}
@@ -40,7 +41,7 @@ export default class UserController implements IUserController {
     const response = await this.userService.login(data);
 
     // set cookie
-    const cookieOptions = getCookieOptions({ purpose: "auth", type: "minute", value: envConfig.ACCESS_TOKEN_EXPIRE });
+    const cookieOptions = getCookieOptions({ purpose: "auth", type: "minute", value: minutesSeconds(5) });
     res.cookie("accessToken", response.data.accessToken, cookieOptions);
 
     res.status(200).json(response);
@@ -49,6 +50,27 @@ export default class UserController implements IUserController {
     const { user } = req as IAuthenticatedRequest;
 
     const response = await this.userService.activate2FA(user);
+
+    res.status(200).json(response);
+  };
+  verify2FA: RequestHandler = async (req, res, next) => {
+    const { user } = req as IAuthenticatedRequest;
+
+    const body = req.body as IUserRequestData["verify2FA"]["body"];
+
+    // validate user data
+    const { success, data, error } = verify2FAValidator.safeParse(body);
+
+    if (!success) {
+      next(error);
+      return;
+    }
+    // login user
+    const response = await this.userService.verify2FA({ user, body: { totp: data.totp } });
+
+    // set cookie
+    const cookieOptions = getCookieOptions({ purpose: "auth", type: "day", value: daysMiliSeconds(30) });
+    res.cookie("accessToken", response.data.accessToken, cookieOptions);
 
     res.status(200).json(response);
   };

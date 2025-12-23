@@ -1,4 +1,4 @@
 export type JwtPaylaod = {
   userId: string;
-  stage: "password" | "auth-code";
+  stage: "password" | "2fa";
 };

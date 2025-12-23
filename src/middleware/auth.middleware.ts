@@ -7,7 +7,7 @@ import { JwtPaylaod } from "../types/jwt.types";
 import { ApplicationException } from "../helper/error.helper";
 
 type TAuthMiddlewareParams = {
-  stage: ("password" | "auth-code")[];
+  stage: ("password" | "2fa")[];
   repositories: {
     userRepository: IUserRepository;
   };
@@ -28,7 +28,7 @@ const authMiddleware = (params: TAuthMiddlewareParams): RequestHandler => async 
     }
 
     if (isAuthenticated) {
-      const user = await params.repositories.userRepository.findOne({ _id: jwtPaylaodFData.userId }, "+twoFactorAuth");
+      const user = await params.repositories.userRepository.findOne({ _id: jwtPaylaodFData.userId }, "+twoFactorAuth.secret");
 
       if (user) {
         req.user = user;

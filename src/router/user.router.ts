@@ -20,4 +20,6 @@ userRouter.route("/login").post(userController.login);
 
 userRouter.route("/activate-2fa").post(authMiddleware({ stage: ["password"], repositories: { userRepository } }), userController.activate2FA);
 
+userRouter.route("/verify-2fa").post(authMiddleware({ stage: ["2fa"], repositories: { userRepository } }), userController.verify2FA);
+
 export default userRouter;

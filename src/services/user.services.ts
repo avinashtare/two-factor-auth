@@ -1,3 +1,4 @@
+import { Secret } from "otpauth";
 import envConfig from "../config/env.config";
 import { generateRecoveryCodes, generateTOTP } from "../helper/2fa.heloper";
 import { ApplicationException } from "../helper/error.helper";
@@ -7,6 +8,8 @@ import { createQRCodeDataURL } from "../helper/qr.heloper";
 import { serviceSuccess } from "../helper/service.heloper";
 import { IUserRepository, IUserRequestData, IUserService } from "../interfaces/user.interface";
 import { JwtPaylaod } from "../types/jwt.types";
+import { TServiceSuccess } from "../types/service.type";
+import { daysMiliSeconds, minutesMiliSeconds } from "../helper/date-time.helper";
 
 export default class UserService implements IUserService {
   constructor(private userRepository: IUserRepository) {}
@@ -53,7 +56,8 @@ export default class UserService implements IUserService {
       stage: "password",
     };
 
-    const accessToken = signJwt(tokenPayload, envConfig.ACCESS_TOKEN_SECRET, envConfig.ACCESS_TOKEN_EXPIRE);
+    // generate short access token
+    const accessToken = signJwt(tokenPayload, envConfig.ACCESS_TOKEN_SECRET, minutesMiliSeconds(5));
 
     return serviceSuccess("Login successfully", {
       userId: String(user._id),
@@ -92,5 +96,40 @@ export default class UserService implements IUserService {
 
     // 2FA QR generation
     return serviceSuccess("Activation completed", { qrDataUrl, recoveryCodes: recoveryCodes.plainText });
+  };
+  verify2FA = async (payload: IUserRequestData["verify2FA"]) => {
+    const { user } = payload;
+    const totp = generateTOTP(user.name, user.twoFactorAuth.secret!);
+
+    // delta value if 0 otp is valid
+    const delta = totp.validate({
+      token: payload.body.totp,
+      window: 1, // allow only current otp like (30s not previous) is you want previous use windows 2 as you want
+    });
+
+    if (delta !== 0) {
+      throw new ApplicationException("Invalid credentials", 400);
+    }
+
+    const is2FAActivated = user.twoFactorAuth.activated;
+
+    // if already activated
+    if (!is2FAActivated) {
+      // update user activaton
+      const updateUserActivaton = await this.userRepository.updateOne({ _id: String(user._id) }, { $set: { "twoFactorAuth.activated": true } });
+
+      // if not able to update activated status
+      if (updateUserActivaton.modifiedCount === 0) {
+        throw new ApplicationException("Invalid credentials", 400);
+      }
+    }
+    // else {
+    //   throw new ApplicationException("Unauthorised", 401);
+    // }
+
+    // generate long access token
+    const accessToken = signJwt({ stage: "2fa", userId: String(user._id) }, envConfig.ACCESS_TOKEN_SECRET, daysMiliSeconds(30));
+
+    return serviceSuccess("TwoFactorAuth Suucess", { userId: String(user._id), accessToken });
   };
 }

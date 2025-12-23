@@ -6,7 +6,7 @@ export const registerUserValidator = z.object({
   password: z
     .string()
     .min(8)
-    .max(24)
+    .max(24),
 });
 
 export const loginUserValidator = z.object({
@@ -14,5 +14,9 @@ export const loginUserValidator = z.object({
   password: z
     .string()
     .min(8)
-    .max(24)
+    .max(24),
+});
+
+export const verify2FAValidator = z.object({
+  totp: z.string().length(6),
 });
