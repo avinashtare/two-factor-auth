@@ -2,8 +2,8 @@ import { IUserSchema } from "../types/user.type";
 import { QueryFilter, UpdateQuery, UpdateWriteOpResult } from "mongoose";
 import { RequestHandler } from "express";
 import { TServiceSuccess } from "../types/service.type";
-import z from "zod";
-import { loginUserValidator, registerUserValidator, verify2FAValidator } from "../validator/user.validator";
+import z, { TypeOf } from "zod";
+import { loginUserValidator, registerUserValidator, recover2FAValidator, verify2FAValidator } from "../validator/user.validator";
 
 export interface IUserRequestData {
   register: {
@@ -11,6 +11,10 @@ export interface IUserRequestData {
   };
   login: {
     body: z.infer<typeof loginUserValidator>;
+  };
+  recover2FA: {
+    user: IUserSchema;
+    body: z.infer<typeof recover2FAValidator>;
   };
   activate2FA: {
     user: IUserSchema;
@@ -31,6 +35,7 @@ export interface IUserRequestData {
 export interface IUserController {
   register: RequestHandler;
   login: RequestHandler;
+  recover2FA: RequestHandler;
   activate2FA: RequestHandler;
   verify2FA: RequestHandler;
   me: RequestHandler;
@@ -40,6 +45,7 @@ export interface IUserController {
 export interface IUserService {
   register: (payload: IUserRequestData["register"]["body"]) => Promise<TServiceSuccess<{ userId: string }>>;
   login: (payload: IUserRequestData["login"]["body"]) => Promise<TServiceSuccess<{ userId: string; accessToken: string }>>;
+  recover2FA: (payload: IUserRequestData["recover2FA"]) => Promise<TServiceSuccess<{ userId: string; accessToken: string }>>;
   activate2FA: (payload: IUserRequestData["activate2FA"]["user"]) => Promise<TServiceSuccess<{ qrDataUrl: string; recoveryCodes: string[] }>>;
   verify2FA: (payload: IUserRequestData["verify2FA"]) => Promise<TServiceSuccess<{ userId: string; accessToken: string }>>;
   me: (

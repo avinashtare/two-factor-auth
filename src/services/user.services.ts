@@ -1,4 +1,3 @@
-import { Secret } from "otpauth";
 import envConfig from "../config/env.config";
 import { generateRecoveryCodes, generateTOTP } from "../helper/2fa.heloper";
 import { ApplicationException } from "../helper/error.helper";
@@ -9,7 +8,7 @@ import { serviceSuccess } from "../helper/service.heloper";
 import { IUserRepository, IUserRequestData, IUserService } from "../interfaces/user.interface";
 import { JwtPaylaod } from "../types/jwt.types";
 import { daysMiliSeconds, minutesMiliSeconds } from "../helper/date-time.helper";
-import { TServiceSuccess } from "../types/service.type";
+import { IUserSchema } from "../types/user.type";
 
 export default class UserService implements IUserService {
   constructor(private userRepository: IUserRepository) {}
@@ -63,6 +62,63 @@ export default class UserService implements IUserService {
       userId: String(user._id),
       accessToken,
     });
+  };
+
+  recover2FA = async (payload: IUserRequestData["recover2FA"]) => {
+    const { body, user } = payload;
+
+    // user param recovery code
+    const inputRecoverCode = body.recoverCode;
+
+    // all recover code
+    const recoveryCodes = user.twoFactorAuth.recoveryCodes;
+
+    // check user 2fa activated or not
+    const is2FAActivated = user.twoFactorAuth.activated;
+
+    if (!is2FAActivated) throw new ApplicationException("Recovery failed", 400);
+
+    let validRCodes: IUserSchema["twoFactorAuth"]["recoveryCodes"][0] | null = null;
+
+    for (const rc of recoveryCodes) {
+      if (!rc.used) {
+        const isCodeValid = await compareHash(inputRecoverCode, rc.code);
+
+        // recovery code match
+        if (isCodeValid) {
+          validRCodes = rc;
+          break;
+        }
+      }
+    }
+
+    // recovery code no mathc
+    if (!validRCodes) {
+      throw new ApplicationException("Recovery failed", 400);
+    }
+
+    // update used recovery code
+    const updateRecoveryCodes = recoveryCodes.map((rc) => {
+      if (rc.code == validRCodes.code) {
+        return { code: rc.code, used: true };
+      }
+      return rc;
+    });
+
+    const updateCodes = await this.userRepository.updateOne(
+      { _id: String(user._id) },
+      { $set: { "twoFactorAuth.recoveryCodes": updateRecoveryCodes } },
+    );
+
+    // if not able to update  recoveryCodes
+    if (updateCodes.modifiedCount === 0) {
+      throw new ApplicationException("Recovery failed", 400);
+    }
+
+    // generate long access token
+    const accessToken = signJwt({ stage: "2fa", userId: String(user._id) }, envConfig.ACCESS_TOKEN_SECRET, daysMiliSeconds(30));
+
+    return serviceSuccess("Logged in using recovery success", { userId: String(user._id), accessToken });
   };
 
   activate2FA = async (user: IUserRequestData["activate2FA"]["user"]) => {

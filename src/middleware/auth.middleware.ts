@@ -28,7 +28,10 @@ const authMiddleware = (params: TAuthMiddlewareParams): RequestHandler => async 
     }
 
     if (isAuthenticated) {
-      const user = await params.repositories.userRepository.findOne({ _id: jwtPaylaodFData.userId }, "+twoFactorAuth.secret");
+      const user = await params.repositories.userRepository.findOne(
+        { _id: jwtPaylaodFData.userId },
+        "+twoFactorAuth.secret +twoFactorAuth.recoveryCodes",
+      );
 
       if (user) {
         req.user = user;

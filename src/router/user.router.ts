@@ -20,6 +20,8 @@ userRouter.route("/login").post(userController.login);
 
 userRouter.route("/activate-2fa").post(authMiddleware({ stage: ["password"], repositories: { userRepository } }), userController.activate2FA);
 
+userRouter.route("/recover-2fa").put(authMiddleware({ stage: ["password"], repositories: { userRepository } }), userController.recover2FA);
+
 userRouter.route("/verify-2fa").post(authMiddleware({ stage: ["password"], repositories: { userRepository } }), userController.verify2FA);
 
 userRouter.route("/me").post(authMiddleware({ stage: ["2fa", "password"], repositories: { userRepository } }), userController.me);

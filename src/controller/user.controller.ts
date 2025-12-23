@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { IUserController, IUserRequestData, IUserService } from "../interfaces/user.interface";
-import { loginUserValidator, registerUserValidator, verify2FAValidator } from "../validator/user.validator";
+import { loginUserValidator, registerUserValidator, recover2FAValidator, verify2FAValidator } from "../validator/user.validator";
 import { getCookieOptions } from "../helper/cookie.helper";
 import { IAuthenticatedRequest } from "../types/auth.type";
 import { daysMiliSeconds, minutesSeconds } from "../helper/date-time.helper";
@@ -42,6 +42,22 @@ export default class UserController implements IUserController {
     // set cookie
     const cookieOptions = getCookieOptions({ purpose: "auth", type: "minute", value: minutesSeconds(5) });
     res.cookie("accessToken", response.data.accessToken, cookieOptions);
+
+    res.status(200).json(response);
+  };
+  recover2FA: RequestHandler = async (req, res, next) => {
+    const { user } = req as IAuthenticatedRequest;
+    const body = req.body as IUserRequestData["recover2FA"]["body"];
+
+    // validate user data
+    const { success, data, error } = recover2FAValidator.safeParse(body);
+
+    if (!success) {
+      next(error);
+      return;
+    }
+
+    const response = await this.userService.recover2FA({ user, body: { recoverCode: data.recoverCode } });
 
     res.status(200).json(response);
   };
