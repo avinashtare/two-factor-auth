@@ -19,6 +19,9 @@ export interface IUserRequestData {
     user: IUserSchema;
     body: z.infer<typeof verify2FAValidator>;
   };
+  me: {
+    user: IUserSchema;
+  };
 }
 
 // controller
@@ -27,6 +30,7 @@ export interface IUserController {
   login: RequestHandler;
   activate2FA: RequestHandler;
   verify2FA: RequestHandler;
+  me: RequestHandler;
 }
 
 export interface IUserService {
@@ -34,6 +38,15 @@ export interface IUserService {
   login: (payload: IUserRequestData["login"]["body"]) => Promise<TServiceSuccess<{ userId: string; accessToken: string }>>;
   activate2FA: (payload: IUserRequestData["activate2FA"]["user"]) => Promise<TServiceSuccess<{ qrDataUrl: string; recoveryCodes: string[] }>>;
   verify2FA: (payload: IUserRequestData["verify2FA"]) => Promise<TServiceSuccess<{ userId: string; accessToken: string }>>;
+  me: (
+    payload: IUserRequestData["me"],
+  ) => TServiceSuccess<{
+    userId: string;
+    name: string;
+    email: string;
+    twoFactorAuth: { activated: boolean };
+    createdAt: Date;
+  }>;
 }
 
 export interface IUserRepository {

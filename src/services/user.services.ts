@@ -8,7 +8,6 @@ import { createQRCodeDataURL } from "../helper/qr.heloper";
 import { serviceSuccess } from "../helper/service.heloper";
 import { IUserRepository, IUserRequestData, IUserService } from "../interfaces/user.interface";
 import { JwtPaylaod } from "../types/jwt.types";
-import { TServiceSuccess } from "../types/service.type";
 import { daysMiliSeconds, minutesMiliSeconds } from "../helper/date-time.helper";
 
 export default class UserService implements IUserService {
@@ -131,5 +130,16 @@ export default class UserService implements IUserService {
     const accessToken = signJwt({ stage: "2fa", userId: String(user._id) }, envConfig.ACCESS_TOKEN_SECRET, daysMiliSeconds(30));
 
     return serviceSuccess("TwoFactorAuth Suucess", { userId: String(user._id), accessToken });
+  };
+  me = (payload: IUserRequestData["me"]) => {
+    let { user } = payload;
+
+    return serviceSuccess("User data", {
+      userId: String(user._id),
+      name: user.name,
+      email: user.email,
+      twoFactorAuth: { activated: false },
+      createdAt: user.createdAt!,
+    });
   };
 }

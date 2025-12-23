@@ -2,9 +2,6 @@ import { RequestHandler } from "express";
 import { IUserController, IUserRequestData, IUserService } from "../interfaces/user.interface";
 import { loginUserValidator, registerUserValidator, verify2FAValidator } from "../validator/user.validator";
 import { getCookieOptions } from "../helper/cookie.helper";
-import envConfig from "../config/env.config";
-import { ParamsDictionary } from "express-serve-static-core";
-import { ParsedQs } from "qs";
 import { IAuthenticatedRequest } from "../types/auth.type";
 import { daysMiliSeconds, minutesSeconds } from "../helper/date-time.helper";
 
@@ -71,6 +68,13 @@ export default class UserController implements IUserController {
     // set cookie
     const cookieOptions = getCookieOptions({ purpose: "auth", type: "day", value: daysMiliSeconds(30) });
     res.cookie("accessToken", response.data.accessToken, cookieOptions);
+
+    res.status(200).json(response);
+  };
+  me: RequestHandler = async (req, res, next) => {
+    const { user } = req as IAuthenticatedRequest;
+
+    const response = await this.userService.me({ user });
 
     res.status(200).json(response);
   };
