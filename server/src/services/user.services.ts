@@ -125,7 +125,7 @@ export default class UserService implements IUserService {
     const is2FAActivated = user.twoFactorAuth.activated;
 
     if (is2FAActivated) {
-      throw new ApplicationException("Already Activated", 400);
+      throw new ApplicationException("Already Activated", 400, { activated: true });
     }
 
     // TOTP (time based otp) generation
@@ -147,7 +147,7 @@ export default class UserService implements IUserService {
     }
 
     // 2FA QR generation
-    return serviceSuccess("Activation completed", { qrDataUrl });
+    return serviceSuccess("Activation completed", { qrDataUrl, secret });
   };
   verify2FA = async (payload: IUserRequestData["verify2FA"]) => {
     const { user } = payload;

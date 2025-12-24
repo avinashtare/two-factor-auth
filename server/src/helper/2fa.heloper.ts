@@ -1,15 +1,17 @@
-import { customAlphabet } from "nanoid";
 import OTPauth from "otpauth";
 import { hashValue } from "./password-encryption.helper";
+import { generateAlphaNumaricString } from "./random.helper";
 
 export const generateTOTP = (name: string, base32?: string) => {
+  const secret = base32 ?? generateAlphaNumaricString(16);
+
   const totp = new OTPauth.TOTP({
     issuer: "avinash.com", // app/website name
     label: name, // user info
-    algorithm: "SHA256",
+    algorithm: "SHA1", // you can use SHA256
     digits: 6, // otp count min:6 count
     period: 30, // new otp time min: 30s
-    ...(base32 ? { secret: OTPauth.Secret.fromBase32(base32) } : {}),
+    secret,
   });
 
   return totp;
@@ -18,15 +20,13 @@ export const generateTOTP = (name: string, base32?: string) => {
 export type TRecoveryCodes = Record<"plainText" | "hashed", string[]>;
 
 export const generateRecoveryCodes = async (count: number): Promise<TRecoveryCodes> => {
-  const alphaNumaricStr = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
   const recoveryCodes: TRecoveryCodes = {
     plainText: [],
     hashed: [],
   };
 
   for (let i = 0; i < count; i++) {
-    const recoveryCode = customAlphabet(alphaNumaricStr, 10)();
+    const recoveryCode = generateAlphaNumaricString(10);
     recoveryCodes.plainText.push(recoveryCode);
 
     const hashedRecoveryCode = await hashValue(recoveryCode);

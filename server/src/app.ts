@@ -3,8 +3,17 @@ import globalErrorMiddleware from "./middleware/global-error.middleware";
 import { ApplicationException } from "./helper/error.helper";
 import router from "./router/init.router";
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 const app = express();
+
+// cors
+app.use(
+  cors({
+    origin: "http://localhost:5173", // EXACT frontend origin
+    credentials: true,
+  }),
+);
 
 // cookie parser
 app.use(cookieParser());

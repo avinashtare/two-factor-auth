@@ -46,7 +46,7 @@ export interface IUserService {
   register: (payload: IUserRequestData["register"]["body"]) => Promise<TServiceSuccess<{ userId: string }>>;
   login: (payload: IUserRequestData["login"]["body"]) => Promise<TServiceSuccess<{ userId: string; accessToken: string }>>;
   recover2FA: (payload: IUserRequestData["recover2FA"]) => Promise<TServiceSuccess<{ userId: string; accessToken: string }>>;
-  activate2FA: (payload: IUserRequestData["activate2FA"]["user"]) => Promise<TServiceSuccess<{ qrDataUrl: string }>>;
+  activate2FA: (payload: IUserRequestData["activate2FA"]["user"]) => Promise<TServiceSuccess<{ qrDataUrl: string; secret: string }>>;
   verify2FA: (payload: IUserRequestData["verify2FA"]) => Promise<TServiceSuccess<{ userId: string; recoveryCodes: string[]; accessToken: string }>>;
   me: (
     payload: IUserRequestData["me"],
