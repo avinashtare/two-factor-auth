@@ -1,9 +1,9 @@
 import OTPauth from "otpauth";
 import { hashValue } from "./password-encryption.helper";
-import { generateAlphaNumaricString } from "./random.helper";
+import { generateAlphaNumaricString, generateBase32Secret } from "./random.helper";
 
 export const generateTOTP = (name: string, base32?: string) => {
-  const secret = base32 ?? generateAlphaNumaricString(16);
+  const secret = base32 ?? generateBase32Secret(16);
 
   const totp = new OTPauth.TOTP({
     issuer: "avinash.com", // app/website name

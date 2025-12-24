@@ -3,9 +3,6 @@ import { IUserController, IUserRequestData, IUserService } from "../interfaces/u
 import { loginUserValidator, registerUserValidator, recover2FAValidator, verify2FAValidator } from "../validator/user.validator";
 import { getCookieOptions } from "../helper/cookie.helper";
 import { IAuthenticatedRequest } from "../types/auth.type";
-import { daysMiliSeconds, minutesSeconds } from "../helper/date-time.helper";
-import { ParamsDictionary } from "express-serve-static-core";
-import { ParsedQs } from "qs";
 
 export default class UserController implements IUserController {
   constructor(private userService: IUserService) {}
@@ -40,7 +37,7 @@ export default class UserController implements IUserController {
     const response = await this.userService.login(data);
 
     // set cookie
-    const cookieOptions = getCookieOptions({ purpose: "auth", type: "minute", value: minutesSeconds(5) });
+    const cookieOptions = getCookieOptions({ purpose: "auth", type: "minute", value: 5 });
     res.cookie("accessToken", response.data.accessToken, cookieOptions);
 
     res.status(200).json(response);
@@ -84,7 +81,7 @@ export default class UserController implements IUserController {
     const response = await this.userService.verify2FA({ user, body: { totp: data.totp } });
 
     // set cookie
-    const cookieOptions = getCookieOptions({ purpose: "auth", type: "day", value: daysMiliSeconds(30) });
+    const cookieOptions = getCookieOptions({ purpose: "auth", type: "day", value: 30 });
     res.cookie("accessToken", response.data.accessToken, cookieOptions);
 
     res.status(200).json(response);

@@ -30,7 +30,7 @@ const globalErrorMiddleware: ErrorRequestHandler = (err: TGlobalError, _req, res
   // jwt erro handle
   else if (err instanceof JsonWebTokenError) {
     statusCode = 401;
-    errorMessage = "Invalid Token";
+    errorMessage = "Unauthorized";
   }
 
   const response = {

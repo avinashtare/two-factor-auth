@@ -7,7 +7,7 @@ import { createQRCodeDataURL } from "../helper/qr.heloper";
 import { serviceSuccess } from "../helper/service.heloper";
 import { IUserRepository, IUserRequestData, IUserService } from "../interfaces/user.interface";
 import { JwtPaylaod } from "../types/jwt.types";
-import { daysMiliSeconds, minutesMiliSeconds } from "../helper/date-time.helper";
+import { daysMiliSeconds, minutesSeconds } from "../helper/date-time.helper";
 import { IUserSchema } from "../types/user.type";
 
 export default class UserService implements IUserService {
@@ -56,7 +56,7 @@ export default class UserService implements IUserService {
     };
 
     // generate short access token
-    const accessToken = signJwt(tokenPayload, envConfig.ACCESS_TOKEN_SECRET, minutesMiliSeconds(5));
+    const accessToken = signJwt(tokenPayload, envConfig.ACCESS_TOKEN_SECRET, minutesSeconds(5));
 
     return serviceSuccess("Login successfully", {
       userId: String(user._id),
