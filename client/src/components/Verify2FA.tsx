@@ -1,6 +1,7 @@
 import { API_ROUTES } from "@/const/api.const";
 import type { TVerify2FaSuccess } from "@/types/api.types";
 import { sendRequest } from "@/utils/api.utils";
+import { setCookie } from "@/utils/cookie.utils";
 import { Loader2, Shield } from "lucide-react";
 import { useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
@@ -30,12 +31,15 @@ function Verify2FA({
     setLoading(false);
 
     if (res?.success) {
+      // add activated flag in cookie
+      setCookie("activated", "yes");
+
       const recoveryCodes = res.data.recoveryCodes;
       // if user recoveryCodes exist so it's fisrt time so send to downlaod page
       if (recoveryCodes.length > 0) {
         addRecoverCodes(recoveryCodes);
       } else {
-        navigate("/");
+        navigate("/dashboard");
       }
 
       toast.success("Verification success");

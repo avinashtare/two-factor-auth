@@ -20,4 +20,12 @@ export const API_ROUTES = {
     url: `${API_CONFIG.BASE_URL}/api/v1/user/activate-2fa`,
     method: "POST",
   },
+  USER: {
+    url: `${API_CONFIG.BASE_URL}/api/v1/user/me`,
+    method: "POST",
+  },
+  LOGOUT: {
+    url: `${API_CONFIG.BASE_URL}/api/v1/user/logout`,
+    method: "POST",
+  },
 } as const satisfies Record<string, { url: string; method: string }>;
