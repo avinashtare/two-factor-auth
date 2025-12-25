@@ -205,7 +205,7 @@ export default class UserService implements IUserService {
       userId: String(user._id),
       name: user.name,
       email: user.email,
-      twoFactorAuth: { activated: false },
+      twoFactorAuth: { activated: user.twoFactorAuth.activated },
       createdAt: user.createdAt!,
     });
   };
