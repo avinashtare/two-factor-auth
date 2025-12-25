@@ -11,7 +11,7 @@ import {
 import { useEffect } from "react";
 import LoadingScreen from "./Loading";
 import { ErrorState } from "./ErrorState";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Dashbaord() {
   const {
@@ -20,8 +20,11 @@ function Dashbaord() {
     isLoading,
     isError,
     isLogin,
+    setLogin,
   } = useUserContext();
+
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleEnable2FA = () => {
     // Navigate to 2FA setup
@@ -30,13 +33,14 @@ function Dashbaord() {
   // fetch user
   useEffect(() => {
     (() => {
-      if (isLogin) {
+      if (isLogin || location.state?.isLogin) {
+        setLogin(true);
         fetchUser();
       } else {
         navigate("/");
       }
     })();
-  }, [navigate, fetchUser, isLogin]);
+  }, [navigate, fetchUser, isLogin, location, setLogin]);
 
   return (
     <>

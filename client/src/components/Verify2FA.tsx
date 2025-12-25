@@ -1,4 +1,5 @@
 import { API_ROUTES } from "@/const/api.const";
+import useUserContext from "@/contexts/user/UserContext";
 import type { TVerify2FaSuccess } from "@/types/api.types";
 import { sendRequest } from "@/utils/api.utils";
 import { setCookie } from "@/utils/cookie.utils";
@@ -15,6 +16,7 @@ function Verify2FA({
   addRecoverCodes: (codes: string[]) => void;
 }) {
   const navigate = useNavigate();
+  const { setLogin } = useUserContext();
   const [verificationCode, setVerificationCode] = useState("");
   const [isLoading, setLoading] = useState(false);
 
@@ -39,7 +41,8 @@ function Verify2FA({
       if (recoveryCodes.length > 0) {
         addRecoverCodes(recoveryCodes);
       } else {
-        navigate("/dashboard");
+        setLogin(true);
+        navigate("/dashboard", { state: { isLogin: true } });
       }
 
       toast.success("Verification success");

@@ -1,8 +1,17 @@
+import useUserContext from "@/contexts/user/UserContext";
 import { Shield, Zap, Lock, Users } from "lucide-react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { fetchUser } = useUserContext();
+
+  useEffect(() => {
+    (() => {
+      fetchUser();
+    })();
+  }, [fetchUser]);
 
   return (
     <>

@@ -34,6 +34,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
     setLoading(false);
 
+    // got user data
     if (user.success) {
       setUser(user.data);
       setLogin(true);
@@ -54,8 +55,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       if (getCookie("activated")?.toLocaleLowerCase() !== "yes") {
         clearCookie("activated");
         setLogin(false);
-      } else {
-        setLogin(true);
       }
 
       setUser(null);
@@ -65,7 +64,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
   return (
     <UserContext.Provider
-      value={{ fetchUser, user, isLoading, isError, isLogin }}
+      value={{ fetchUser, user, isLoading, isError, isLogin, setLogin }}
     >
       {children}
     </UserContext.Provider>

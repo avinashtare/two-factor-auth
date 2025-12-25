@@ -11,6 +11,7 @@ export interface TUser {
 export type UserContextType = {
   user: TUser | null;
   isLogin: boolean;
+  setLogin: (t: boolean) => void;
   isLoading: boolean;
   fetchUser: () => void;
   isError: { error: boolean; message?: string };

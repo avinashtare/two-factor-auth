@@ -35,7 +35,7 @@ export default function RecoveryCodes({
   const handleContinue = () => {
     if (confirmed) {
       // Navigate to next step
-      navigate("/dashboard");
+      navigate("/dashboard", { state: { isLogin: true } });
     }
   };
 
