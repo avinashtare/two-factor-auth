@@ -4,7 +4,7 @@ import envConfig from "../config/env.config";
 
 type TCookieParam =
   | {
-      purpose: "auth";
+      purpose: "auth" | "no-auth";
       type: "minute" | "day";
       value: number;
     }
@@ -13,12 +13,12 @@ type TCookieParam =
 export const getCookieOptions = (params: TCookieParam): CookieOptions => {
   const cookieOptions: CookieOptions = {
     path: "/api/v1",
-    httpOnly: true,
+    httpOnly: params.purpose === "no-auth" ? false : true,
   };
 
-  if (params.purpose == "auth") {
-    let maxAge = 0;
+  let maxAge = 0;
 
+  if (params.purpose !== "logout") {
     switch (params.type) {
       case "minute": {
         maxAge = minutesMiliSeconds(params.value);
@@ -29,10 +29,11 @@ export const getCookieOptions = (params: TCookieParam): CookieOptions => {
         break;
       }
     }
-    cookieOptions.sameSite = "lax";
-    cookieOptions.secure = false;
-    cookieOptions.maxAge = maxAge;
   }
+
+  cookieOptions.maxAge = maxAge;
+  cookieOptions.sameSite = "lax";
+  cookieOptions.secure = false;
 
   if (envConfig.NODE_ENV == "production") {
     cookieOptions.sameSite = "strict";
