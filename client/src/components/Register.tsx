@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -26,6 +26,7 @@ function Register() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
   const registerUserAPI = async (data: TRegisterValidator) => {
     const url = "http://localhost:3000/api/v1/user/register";
@@ -52,7 +53,9 @@ function Register() {
   };
 
   const onSubmit = async (data: TRegisterValidator) => {
+    setLoading(true);
     const res = (await registerUserAPI(data)) as TRegisterAPsuccess;
+    setLoading(false);
 
     if (!res.success) {
       if (res.message === "User already exist") {
@@ -161,11 +164,12 @@ function Register() {
 
           <button
             type="submit"
-            className={`w-full bg-purple-600 text-white py-3 rounded-lg ${
-              isValid && "cursor-pointer"
+            className={`w-full bg-purple-600 text-white py-3 rounded-lg flex justify-center ${
+              !isLoading && isValid && "cursor-pointer"
             }`}
+            disabled={isLoading}
           >
-            Register
+            {!isLoading ? "Register" : <Loader2 className="animate-spin" />}
           </button>
         </div>
 

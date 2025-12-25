@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,16 +12,16 @@ import { toast } from "react-toastify";
 
 function Login() {
   const navigate = useNavigate();
-  // const notify = () => toast.error("invalid password");
 
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
     resetField,
     reset,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<TLoginValidator>({
     resolver: zodResolver(loginValidator),
     mode: "onChange", // ✅ live validation
@@ -53,7 +53,9 @@ function Login() {
   };
 
   const onSubmit = async (data: TLoginValidator) => {
+    setLoading(true);
     const res = (await loginUserAPI(data)) as TLoginAPsuccess;
+    setLoading(false);
 
     // if success
     if (res.success && res.data.userId) {
@@ -131,8 +133,13 @@ function Login() {
               Forgot password?
             </button>
           </div>
-          <button className="w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 rounded-lg transition duration-200 font-medium shadow-lg shadow-purple-500/30">
-            Sign In
+          <button
+            className={`w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 rounded-lg transition duration-200 font-medium shadow-lg shadow-purple-500/30 flex justify-center ${
+              !isLoading && isValid && "cursor-pointer"
+            }`}
+            disabled={isLoading}
+          >
+            {!isLoading ? "Sign In" : <Loader2 className="animate-spin" />}
           </button>
         </div>
         <div className="mt-6 text-center">

@@ -1,5 +1,5 @@
 import type { TVerify2FaSuccess } from "@/types/api.types";
-import { Shield } from "lucide-react";
+import { Loader2, Shield } from "lucide-react";
 import { useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -13,6 +13,7 @@ function Verify2FA({
 }) {
   const navigate = useNavigate();
   const [verificationCode, setVerificationCode] = useState("");
+  const [isLoading, setLoading] = useState(false);
 
   // server to find stage of user
   const verifye2FaAPI = async () => {
@@ -34,9 +35,11 @@ function Verify2FA({
   };
 
   const handleVerify = async () => {
+    setLoading(true);
     const res = (await verifye2FaAPI()) as TVerify2FaSuccess;
+    setLoading(false);
 
-    if (res.success) {
+    if (res?.success) {
       const recoveryCodes = res.data.recoveryCodes;
       // if user recoveryCodes exist so it's fisrt time so send to downlaod page
       if (recoveryCodes.length > 0) {
@@ -53,12 +56,14 @@ function Verify2FA({
         toast.error("invalid code", { autoClose: 1000 });
         return;
       }
+      if (res.message === "Unauthorized") {
+        navigate("/login");
+      }
 
       // all other errors
       toast.error(res.message);
-      navigate("/login");
     }
-    // Handle verification logic here
+    console.log("res", res);
   };
 
   const handleForgot = () => {
@@ -103,10 +108,10 @@ function Verify2FA({
 
           <button
             onClick={handleVerify}
-            disabled={verificationCode.length !== 6}
-            className="w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed text-white py-3 rounded-lg transition duration-200 font-medium shadow-lg shadow-purple-500/30"
+            disabled={verificationCode.length !== 6 || isLoading}
+            className="w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 cursor-pointer disabled:cursor-not-allowed  text-white py-3 rounded-lg transition duration-200 font-medium shadow-lg shadow-purple-500/30 flex justify-center"
           >
-            Verify Code
+            {!isLoading ? "Verify Code" : <Loader2 className="animate-spin" />}
           </button>
 
           <div className="text-center">
