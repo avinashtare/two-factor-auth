@@ -1,10 +1,13 @@
 import type { TActivate2FaSuccess } from "@/types/api.types";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Verify2FA from "./Verify2FA";
 import Activate2FA from "./Activate2FA";
 import RecoveryCodes from "./RecoveryCodes";
+import { API_ROUTES } from "@/const/api.const";
+import { sendRequest } from "@/utils/api.utils";
+import LoadingScreen from "./Loading";
 
 function TFA() {
   const navigate = useNavigate();
@@ -21,23 +24,18 @@ function TFA() {
     codes: string[];
   }>({ show: false, codes: [] });
 
-  // server to find stage of user
-  const activate2FaAPI = async (): Promise<TActivate2FaSuccess> => {
-    const url = "http://localhost:3000/api/v1/user/activate-2fa";
+  // check user already activated and check whatis stage of user is verify or activation
+  const handle2FA = useCallback(async () => {
+    const res2Fa = (await sendRequest(
+      API_ROUTES.ACTIVATE_TFA.url,
+      {},
+      {
+        method: API_ROUTES.ACTIVATE_TFA.method,
+        credentials: "include",
+      }
+    )) as TActivate2FaSuccess;
 
-    const res = await fetch(url, {
-      method: "post",
-      credentials: "include",
-    });
-
-    const resData = (await res.json()) as TActivate2FaSuccess;
-    return resData;
-  };
-
-  // checkc user already activated or which stage on verify or activation
-  const handle2FA = async () => {
-    const res2Fa = await activate2FaAPI();
-
+    // api res success if user not activated and cookie recived suucessfully
     if (res2Fa.success) {
       setIs2FaActivated((prev) => ({
         ...prev,
@@ -47,25 +45,30 @@ function TFA() {
         secret: res2Fa.data.secret,
       }));
     } else {
-      // send unauthorized user to homepage
-      if (res2Fa.message === "Unauthorized") {
-        toast.error(res2Fa.message);
-        navigate("/");
-      }
-
+      // if user already activated then show verification components
       if (res2Fa.data?.activated) {
         setIs2FaActivated((prev) => ({
           ...prev,
           activated: true,
           loading: false,
         }));
+        return;
       }
+
+      // send unauthorized user to homepage
+      if (res2Fa.message === "Unauthorized") {
+        toast.error(res2Fa.message);
+        navigate("/");
+        return;
+      }
+
+      toast.error(res2Fa.message);
     }
-  };
+  }, [navigate]);
 
   useEffect(() => {
-    handle2FA();
-  }, []);
+    (async () => handle2FA())();
+  }, [handle2FA]);
 
   const addRecoveryCode = (codes: string[]) => {
     setReoveryCodes({ codes, show: true });
@@ -77,6 +80,9 @@ function TFA() {
         <RecoveryCodes recoveryCodes={isReoveryCodes.codes} />
       ) : (
         <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center px-4 py-12">
+          {is2FaActivated.loading && (
+            <LoadingScreen type="2fa-setup" fullScreen={false} />
+          )}
           {is2FaActivated.activated !== null &&
             (is2FaActivated.activated ? (
               // verify stage

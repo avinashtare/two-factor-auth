@@ -6,6 +6,7 @@ import HomePage from "@/components/Home";
 import { ToastContainer } from "react-toastify";
 import About from "@/components/About";
 import TwoFA from "./components/TFA";
+import Dashbaord from "./components/Dashboard";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/login" Component={Login} />
         <Route path="/about" Component={About} />
         <Route path="/2fa" Component={TwoFA} />
+        <Route path="/dashboard" Component={Dashbaord} />
       </Routes>
 
       <ToastContainer />

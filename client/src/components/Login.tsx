@@ -9,6 +9,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { TLoginAPsuccess } from "@/types/api.types";
 import { toast } from "react-toastify";
+import { sendRequest } from "@/utils/api.utils";
+import { API_ROUTES } from "@/const/api.const";
 
 function Login() {
   const navigate = useNavigate();
@@ -27,34 +29,13 @@ function Login() {
     mode: "onChange", // ✅ live validation
   });
 
-  // TLoginAPsuccess
-  const loginUserAPI = async (data: TLoginValidator) => {
-    const url = "http://localhost:3000/api/v1/user/login";
-
-    try {
-      const res = await fetch(url, {
-        method: "post",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
-        credentials: "include",
-      });
-
-      const resData = (await res.json()) as TLoginAPsuccess;
-
-      return resData;
-    } catch {
-      return Error(
-        "Oops! We couldn't reach the server. Please try again later."
-      );
-    }
-  };
-
   const onSubmit = async (data: TLoginValidator) => {
     setLoading(true);
-    const res = (await loginUserAPI(data)) as TLoginAPsuccess;
+    const res = (await sendRequest(API_ROUTES.LOGIN.url, data, {
+      method: API_ROUTES.LOGIN.method,
+      credentials: "include",
+    })) as TLoginAPsuccess;
+
     setLoading(false);
 
     // if success

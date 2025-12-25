@@ -9,6 +9,8 @@ import {
 } from "../validator/auth.validator";
 import type { TRegisterAPsuccess } from "@/types/api.types";
 import { toast } from "react-toastify";
+import { API_ROUTES } from "@/const/api.const";
+import { sendRequest } from "@/utils/api.utils";
 
 function Register() {
   const navigate = useNavigate();
@@ -28,33 +30,20 @@ function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setLoading] = useState(false);
 
-  const registerUserAPI = async (data: TRegisterValidator) => {
-    const url = "http://localhost:3000/api/v1/user/register";
-
-    try {
-      const res = await fetch(url, {
-        method: "post",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          password: data.password,
-        }),
-      });
-
-      const resData = (await res.json()) as TRegisterAPsuccess;
-
-      return resData;
-    } catch {
-      return Error(
-        "Oops! We couldn't reach the server. Please try again later."
-      );
-    }
-  };
-
   const onSubmit = async (data: TRegisterValidator) => {
     setLoading(true);
-    const res = (await registerUserAPI(data)) as TRegisterAPsuccess;
+
+    const reqData = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    };
+
+    const res = (await sendRequest(API_ROUTES.REGISTER.url, reqData, {
+      method: API_ROUTES.REGISTER.method,
+      credentials: "include",
+    })) as TRegisterAPsuccess;
+
     setLoading(false);
 
     if (!res.success) {

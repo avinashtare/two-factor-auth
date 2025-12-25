@@ -1,4 +1,6 @@
+import { API_ROUTES } from "@/const/api.const";
 import type { TVerify2FaSuccess } from "@/types/api.types";
+import { sendRequest } from "@/utils/api.utils";
 import { Loader2, Shield } from "lucide-react";
 import { useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
@@ -15,28 +17,16 @@ function Verify2FA({
   const [verificationCode, setVerificationCode] = useState("");
   const [isLoading, setLoading] = useState(false);
 
-  // server to find stage of user
-  const verifye2FaAPI = async () => {
-    try {
-      const url = "http://localhost:3000/api/v1/user/verify-2fa";
-
-      const res = await fetch(url, {
-        method: "post",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ totp: String(verificationCode) }),
-        credentials: "include",
-      });
-
-      const resData = await res.json();
-      return resData;
-    } catch {
-      Error("Oops! We couldn't reach the server. Please try again later.");
-    }
-  };
-
   const handleVerify = async () => {
     setLoading(true);
-    const res = (await verifye2FaAPI()) as TVerify2FaSuccess;
+
+    const resData = { totp: String(verificationCode) };
+
+    const res = (await sendRequest(API_ROUTES.VERIFY_TFA.url, resData, {
+      method: API_ROUTES.VERIFY_TFA.method,
+      credentials: "include",
+    })) as TVerify2FaSuccess;
+
     setLoading(false);
 
     if (res?.success) {
@@ -63,7 +53,6 @@ function Verify2FA({
       // all other errors
       toast.error(res.message);
     }
-    console.log("res", res);
   };
 
   const handleForgot = () => {
