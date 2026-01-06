@@ -2,12 +2,12 @@ import type { TActivate2FaSuccess } from "@/types/api.types";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import Verify2FA from "./Verify2FA";
-import Activate2FA from "./Activate2FA";
-import RecoveryCodes from "./RecoveryCodes";
+import Verify2FA from "@/components/Verify2FA";
+import Activate2FA from "@/components/Activate2FA";
+import RecoveryCodes from "@/components/RecoveryCodes";
 import { API_ROUTES } from "@/const/api.const";
 import { sendRequest } from "@/utils/api.utils";
-import LoadingScreen from "./Loading";
+import LoadingScreen from "@/components/Loading";
 
 function TFA() {
   const navigate = useNavigate();

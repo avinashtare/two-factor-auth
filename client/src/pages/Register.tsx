@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   registerValidator,
   type TRegisterValidator,
-} from "../validator/auth.validator";
+} from "@/validator/auth.validator";
 import type { TRegisterAPsuccess } from "@/types/api.types";
 import { toast } from "react-toastify";
 import { API_ROUTES } from "@/const/api.const";

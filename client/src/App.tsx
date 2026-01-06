@@ -1,14 +1,14 @@
 import Nav from "@/components/Nav";
 import { Routes, Route } from "react-router-dom";
-import Register from "@/components/Register";
-import Login from "@/components/Login";
-import HomePage from "@/components/Home";
+import Register from "@/pages/Register";
+import Login from "@/pages/Login";
+import HomePage from "@/pages/Home";
 import { ToastContainer } from "react-toastify";
-import About from "@/components/About";
-import TwoFA from "./components/TFA";
-import Dashbaord from "./components/Dashboard";
-import { UserProvider } from "./contexts/user/UserProvider";
-import Logout from "./components/Logout";
+import About from "@/pages/About";
+import TwoFA from "@/pages/TFA";
+import Dashbaord from "@/pages/Dashboard";
+import { UserProvider } from "@/contexts/user/UserProvider";
+import Logout from "@/pages/Logout";
 
 function App() {
   return (

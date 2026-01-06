@@ -9,8 +9,8 @@ import {
   XCircle,
 } from "lucide-react";
 import { useEffect } from "react";
-import LoadingScreen from "./Loading";
-import { ErrorState } from "./ErrorState";
+import LoadingScreen from "@/components/Loading";
+import { ErrorState } from "@/components/ErrorState";
 import { useLocation, useNavigate } from "react-router-dom";
 
 function Dashbaord() {
