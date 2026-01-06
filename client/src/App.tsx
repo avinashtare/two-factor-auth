@@ -9,6 +9,7 @@ import TwoFA from "@/pages/TFA";
 import Dashbaord from "@/pages/Dashboard";
 import { UserProvider } from "@/contexts/user/UserProvider";
 import Logout from "@/pages/Logout";
+import RecoverAccount from "@/pages/RecoverAccount";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/login" Component={Login} />
           <Route path="/about" Component={About} />
           <Route path="/2fa" Component={TwoFA} />
+          <Route path="/recover-account" Component={RecoverAccount} />
           <Route path="/logout" Component={Logout} />
           <Route path="/dashboard" Component={Dashbaord} />
         </Routes>

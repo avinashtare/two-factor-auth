@@ -26,7 +26,7 @@ function Login() {
     formState: { errors, isValid },
   } = useForm<TLoginValidator>({
     resolver: zodResolver(loginValidator),
-    mode: "onChange", // ✅ live validation
+    mode: "onChange",
   });
 
   const onSubmit = async (data: TLoginValidator) => {

@@ -21,3 +21,8 @@ export type TVerify2FaSuccess = TApiSuccess<{
   accessToken: string;
   recoveryCodes: string[];
 }>;
+
+export type TRecovery2FaSuccess = TApiSuccess<{
+  userId: string;
+  accessToken: string;
+}>;

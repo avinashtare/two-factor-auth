@@ -20,6 +20,10 @@ export const API_ROUTES = {
     url: `${API_CONFIG.BASE_URL}/api/v1/user/activate-2fa`,
     method: "POST",
   },
+  RECOVER_TFA: {
+    url: `${API_CONFIG.BASE_URL}/api/v1/user/recover-2fa`,
+    method: "PUT",
+  },
   USER: {
     url: `${API_CONFIG.BASE_URL}/api/v1/user/me`,
     method: "POST",

@@ -62,11 +62,6 @@ function Verify2FA({
     }
   };
 
-  const handleForgot = () => {
-    alert("Forgot 2FA clicked");
-    // Handle forgot 2FA logic here
-  };
-
   const handleCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 6);
     setVerificationCode(value);
@@ -112,7 +107,9 @@ function Verify2FA({
 
           <div className="text-center">
             <button
-              onClick={handleForgot}
+              onClick={() =>
+                navigate("/recover-account", { state: { recover: true } })
+              }
               className="text-sm text-purple-400 hover:text-purple-300 transition duration-200"
             >
               Forgot 2FA or Lost Access?
